@@ -1,0 +1,28 @@
+{
+	"name": "discord-bot", // コンテナ名
+	"build": {
+		"dockerfile": "Dockerfile" // Dockerfileのパス
+	},
+	// VScodeの設定
+	"customizations": {
+		"vscode": {
+			// 拡張機能のインストール
+			"extensions": [
+				"ms-python.python",
+				"njpwerner.autodocstring",
+				"charliermarsh.ruff"
+			],
+			"settings": {
+				"[python]": {
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.fixAll": "explicit",
+						"source.organizeImports": "explicit"
+					},
+					"editor.defaultFormatter": "charliermarsh.ruff"
+				}
+			}
+		}
+	},
+	"postStartCommand": "pre-commit install"
+}
