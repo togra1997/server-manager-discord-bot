@@ -1,3 +1,4 @@
+import shlex
 import subprocess
 
 
@@ -20,7 +21,10 @@ class CommandRunner:
 
         try:
             result = subprocess.run(
-                command, shell=True, check=True, capture_output=True, text=True
+                shlex.split(command),
+                check=True,
+                capture_output=True,
+                text=True,
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
