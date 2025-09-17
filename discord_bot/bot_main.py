@@ -5,6 +5,7 @@ from discord import Intents
 from dotenv import load_dotenv
 from src.utils.run_command import ServerManager
 
+
 load_dotenv()
 intents = Intents.default()
 # Discordのトークンを取得(.envからとる)
@@ -15,6 +16,7 @@ tree = discord.app_commands.CommandTree(client)
 # bashスクリプトのパスを指定
 # bashスクリプトはexecをつけること(バッシュスクリプト内でプロセスを置き換えるため)
 runner = ServerManager(bash_path="./run-server.sh")
+
 
 
 @tree.command(name="start", description="サーバーを起動します")

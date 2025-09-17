@@ -36,3 +36,4 @@ class ServerManager:
             return "Server is running"
         else:
             return "Server is not running"
+
