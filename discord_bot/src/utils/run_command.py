@@ -29,3 +29,5 @@ class CommandRunner:
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"command execution error: {e.stderr.strip()}") from e
+        except Exception as e:
+            raise RuntimeError(f"unexpected error: {str(e)}") from e
