@@ -22,7 +22,7 @@ class CommandRunner:
         try:
             result = subprocess.run(
                 shlex.split(command),
-                check=True,
+                check=False,
                 capture_output=True,
                 text=True,
             )
