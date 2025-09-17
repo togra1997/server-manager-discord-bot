@@ -10,7 +10,8 @@
 			"extensions": [
 				"ms-python.python",
 				"njpwerner.autodocstring",
-				"charliermarsh.ruff"
+				"charliermarsh.ruff",
+				"ms-python.vscode-pylance"
 			],
 			"settings": {
 				"[python]": {
@@ -20,7 +21,8 @@
 						"source.organizeImports": "explicit"
 					},
 					"editor.defaultFormatter": "charliermarsh.ruff"
-				}
+				},
+				"python.defaultInterpreterPath": "/usr/local/bin/python3"
 			}
 		}
 	},
