@@ -3,8 +3,7 @@ import os
 import discord
 from discord import Intents
 from dotenv import load_dotenv
-from src.utils.run_command import ServerManager
-
+from src.run_command import ServerManager
 
 load_dotenv()
 intents: Intents = Intents.default()
