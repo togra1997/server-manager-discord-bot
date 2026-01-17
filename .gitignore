@@ -2,3 +2,5 @@ uv.lock
 .vscode
 __pycache__
 .env
+access.bat
+.pytest_cache
