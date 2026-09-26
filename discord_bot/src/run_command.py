@@ -63,6 +63,7 @@ class ServerManager:
             self.api_key,
         )
         if res.status_code == 200:
+            print(f"{res.text}")
             return start_message
         else:
             return f"Failed to start server: {res.status_code}"
