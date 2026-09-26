@@ -3,20 +3,24 @@ import os
 import discord
 from discord import Intents
 from dotenv import load_dotenv
-from src.make_access_bat import BatMaker
-from src.message import message
 from src.run_command import ServerManager
 
 load_dotenv()
 intents: Intents = Intents.default()
 # Discordのトークンを取得(.envから取得する)
 TOKEN: str | None = os.environ.get("TOKEN")
+HOST: str | None = os.environ.get("HOST")
+PORT: str | None = os.environ.get("PORT")
+API_KEY: str | None = os.environ.get("API_KEY")
+PROJECT_NAME: str | None = os.environ.get("PROJECT_NAME")
 client: discord.Client = discord.Client(intents=intents)
 
 tree: discord.app_commands.CommandTree = discord.app_commands.CommandTree(client)
 # bashスクリプトのパスを指定
 # bashスクリプトはexecをつけること(バッシュスクリプト内でプロセスを置き換えるため)
-runner: ServerManager = ServerManager(bash_path="./run-server.sh")
+runner: ServerManager = ServerManager(
+    host=HOST, port=PORT, api_key=API_KEY, projet_name=PROJECT_NAME
+)
 
 
 @tree.command(name="start", description="サーバーを起動します")
@@ -69,18 +73,10 @@ async def access(interaction: discord.Interaction) -> None:
         interaction (discord.Interaction): Discordのインタラクションオブジェクト
     """
 
-    from pathlib import Path
-
-    url = os.environ.get("SERVER_URL")
-    port = os.environ.get("CLIENT_PORT")
-
-    maker = BatMaker(url, port)
-    maker.make_file()
-    path = Path("access.bat")
-
     await interaction.response.defer()
+    message: str = "サーバーへのアクセス情報\nTailscaleの情報を確認してください"
     await interaction.followup.send(
-        message, file=discord.File(fp=str(path), filename="access.bat")
+        message,
     )
 
 

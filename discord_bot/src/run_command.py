@@ -1,6 +1,4 @@
-import signal
-import subprocess
-from typing import Optional
+import requests
 
 start_message = "Server start"
 stop_message = "Server stop"
@@ -15,13 +13,41 @@ class ServerManager:
     指定したbashスクリプトをサブプロセスとして実行します。
     """
 
-    def __init__(self, bash_path: str):
-        """
-        Args:
-            bash_path (str): 実行するbashスクリプトのパス
-        """
-        self.process: Optional[subprocess.Popen] = None
-        self.bash_path: str = bash_path
+    def __init__(self, host: str, api_key: str, port: str, projet_name: str):
+        self.host = host
+        self.api_key = api_key
+        self.port = port
+        response = self._get_requests(host, "/environments", api_key)
+        self.environment = response.get("data", [])[0].get("id", None)
+        response = self._get_requests(
+            host, f"/environments/{self.environment}/projects", api_key
+        )
+
+        self.projet_id = self._get_projetid(response, projet_name)
+
+    def _get_projetid(self, response, target_name):
+        for project in response.get("data", []):
+            if project.get("name") == target_name:
+                return project.get("id")
+        return None
+
+    def _get_requests(self, host, endpoint, api_key):
+        url = f"http://{host}:{self.port}/api{endpoint}"
+        headers = {"X-API-Key": api_key}
+        response = requests.get(url, headers=headers)
+        return response.json()
+
+    def _post_requests(self, host, endpoint, api_key):
+        url = f"http://{host}:{self.port}/api{endpoint}"
+        headers = {"X-API-Key": api_key, "Content-Type": "application/json"}
+        json_data = {
+            "forceRecreate": True,
+            "pullPolicy": "",
+            "recreateVolumes": True,
+            "removeOrphans": True,
+        }
+        response = requests.post(url, headers=headers, json=json_data)
+        return response
 
     def start(self) -> str:
         """
@@ -30,15 +56,16 @@ class ServerManager:
         Returns:
             str: サーバーの起動状態メッセージ
         """
-        if self.process is None or self.process.poll() is not None:
-            self.process = subprocess.Popen(
-                ["bash", self.bash_path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+
+        res = self._post_requests(
+            self.host,
+            f"/environments/{self.environment}/projects/{self.projet_id}/up",
+            self.api_key,
+        )
+        if res.status_code == 200:
             return start_message
         else:
-            return status_already_running_message
+            return f"Failed to start server: {res.status_code}"
 
     def stop(self) -> str:
         """
@@ -47,17 +74,16 @@ class ServerManager:
         Returns:
             str: サーバーの停止状態メッセージ
         """
-        if self.process is not None and self.process.poll() is None:
-            self.process.send_signal(signal.SIGINT)
-            self.process.terminate()
-            try:
-                self.process.wait(timeout=30)
-            except subprocess.TimeoutExpired:
-                self.process.kill()
-                self.process.wait()
+
+        res = self._post_requests(
+            self.host,
+            f"/environments/{self.environment}/projects/{self.projet_id}/down",
+            self.api_key,
+        )
+        if res.status_code == 200:
             return stop_message
         else:
-            return status_not_running_message
+            return f"Failed to stop server: {res.status_code}"
 
     def status(self) -> str:
         """
@@ -66,7 +92,13 @@ class ServerManager:
         Returns:
             str: サーバーの状態メッセージ
         """
-        if self.process is not None and self.process.poll() is None:
-            return status_running_message
+
+        res = self._get_requests(
+            self.host,
+            f"/environments/{self.environment}/projects/{self.projet_id}/runtime",
+            self.api_key,
+        )
+        if res.get("status_code", 200) == 200:
+            return f"Server status: {res.get('data', {}).get('status', 'unknown')}"
         else:
-            return status_not_running_message
+            return f"Failed to get server status: {res.get('status_code', 'unknown')}"
