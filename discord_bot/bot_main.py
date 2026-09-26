@@ -13,7 +13,6 @@ HOST: str | None = os.environ.get("HOST")
 PORT: str | None = os.environ.get("PORT")
 API_KEY: str | None = os.environ.get("API_KEY")
 PROJECT_NAME: str | None = os.environ.get("PROJECT_NAME")
-ACCESS_URL: str | None = os.environ.get("ACCESS_URL")
 client: discord.Client = discord.Client(intents=intents)
 
 tree: discord.app_commands.CommandTree = discord.app_commands.CommandTree(client)
@@ -75,7 +74,7 @@ async def access(interaction: discord.Interaction) -> None:
     """
 
     await interaction.response.defer()
-    message: str = f"サーバーへのアクセス情報\nアクセスURL: {ACCESS_URL}"
+    message: str = "サーバーへのアクセス情報\nTailscaleの情報を確認してください"
     await interaction.followup.send(
         message,
     )
